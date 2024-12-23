@@ -1,0 +1,13 @@
+version: "3.9"
+name: kvstore
+services:
+  db:
+    image: mysql:8.1
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: kv
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./db:/val/lib/mysql
