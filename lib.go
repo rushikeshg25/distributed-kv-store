@@ -22,21 +22,14 @@ func KeyValueCreationOrUpdate(key string, value any){
 	}
 }
 
-func GetKeyValue(key string) any{
-	var value any
-	var expiresAt int64
-	err:=Db.QueryRow(`SELECT (kv_value,kv_expires_at) FROM kv WHERE kv_key=key`).Scan(&value,&expiresAt)
-	if(err!=nil){
-		log.Fatalf("%s",err)
+func GetKeyValue(key string) ([]byte,error){
+	var value []byte
+	timeNow:=time.Now().Unix()
+	err:=Db.QueryRow(`SELECT (kv_value,kv_expires_at) FROM kv WHERE kv_key=? AND kv_expires_at>?`,key,timeNow).Scan(&value)
+	if err!=nil{
+		return nil,err
 	}
-	if(time.Now().Unix()>expiresAt){
-		_,err:=Db.Exec(`DELETE FROM kv WHERE kv_key=key`,key)
-		if(err!=nil){
-			log.Fatalf("%s",err)
-		}
-		return nil
-	}
-	return value
+	return value,nil
 }
 
 //Incase of Inme DB use the <20% rule to delete keys on cron job 
