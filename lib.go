@@ -33,4 +33,9 @@ func GetKeyValue(key string) ([]byte,error){
 }
 
 //Incase of Inme DB use the <20% rule to delete keys on cron job 
-func DeleteKeyValue(key string){}
+func DeleteKeyValue(key string){
+	_,err:=Db.Exec(`UPDATE kv SET kv_expires_at=0 WHERE kv_key=?`,key)
+	if err!=nil{
+		log.Fatalf("%s",err)
+	}
+}
